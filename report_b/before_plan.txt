@@ -1,1 +1,30 @@
-
+Limit  (cost=51860.35..51860.40 rows=20 width=50) (actual time=160.430..160.483 rows=20.00 loops=1)
+  Buffers: shared hit=2991 read=20506
+  ->  Sort  (cost=51860.35..51897.86 rows=15001 width=50) (actual time=160.429..160.480 rows=20.00 loops=1)
+"        Sort Key: (round(((sum(p.play_duration_seconds))::numeric / 60.0), 1)) DESC NULLS LAST, a.account_id"
+        Sort Method: top-N heapsort  Memory: 27kB
+        Buffers: shared hit=2991 read=20506
+        ->  HashAggregate  (cost=51198.66..51461.18 rows=15001 width=50) (actual time=143.881..155.134 rows=41767.00 loops=1)
+              Group Key: a.account_id
+              Batches: 1  Memory Usage: 3353kB
+              Buffers: shared hit=2988 read=20506
+              ->  Gather  (cost=2632.27..51123.66 rows=15001 width=22) (actual time=8.334..117.051 rows=122930.00 loops=1)
+                    Workers Planned: 2
+                    Workers Launched: 2
+                    Buffers: shared hit=2988 read=20506
+                    ->  Hash Join  (cost=1632.27..48623.56 rows=6250 width=22) (actual time=9.782..102.161 rows=40976.67 loops=3)
+                          Hash Cond: (p.user_id = a.account_id)
+                          Buffers: shared hit=2988 read=20506
+                          ->  Parallel Seq Scan on plays p  (cost=0.00..46974.88 rows=6250 width=8) (actual time=0.176..78.339 rows=40976.67 loops=3)
+                                Filter: ((date(played_at) >= '2025-12-01'::date) AND (date(played_at) <= '2025-12-31'::date))
+                                Rows Removed by Filter: 959099
+                                Buffers: shared hit=1974 read=19999
+                          ->  Hash  (cost=1007.12..1007.12 rows=50012 width=18) (actual time=9.436..9.437 rows=50012.00 loops=3)
+                                Buckets: 65536  Batches: 1  Memory Usage: 2994kB
+                                Buffers: shared hit=1014 read=507
+                                ->  Seq Scan on accounts a  (cost=0.00..1007.12 rows=50012 width=18) (actual time=0.140..4.273 rows=50012.00 loops=3)
+                                      Buffers: shared hit=1014 read=507
+Planning:
+  Buffers: shared hit=65 read=10
+Planning Time: 2.270 ms
+Execution Time: 161.261 ms
