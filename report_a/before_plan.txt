@@ -1,1 +1,40 @@
-
+Limit  (cost=45370.04..45370.09 rows=20 width=158) (actual time=140.901..143.330 rows=20.00 loops=1)
+  Buffers: shared hit=1796 read=20187
+  ->  Sort  (cost=45370.04..45371.09 rows=420 width=158) (actual time=140.901..143.327 rows=20.00 loops=1)
+"        Sort Key: (count(*)) DESC, s.song_id"
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=1796 read=20187
+        ->  Finalize GroupAggregate  (cost=45141.14..45358.87 rows=420 width=158) (actual time=139.984..143.318 rows=27.00 loops=1)
+              Group Key: s.song_id
+              Buffers: shared hit=1796 read=20187
+              ->  Gather Merge  (cost=45141.14..45349.63 rows=1008 width=158) (actual time=139.905..143.303 rows=54.00 loops=1)
+                    Workers Planned: 2
+                    Workers Launched: 2
+                    Buffers: shared hit=1796 read=20187
+                    ->  Partial GroupAggregate  (cost=44141.11..44233.25 rows=420 width=158) (actual time=55.219..55.723 rows=18.00 loops=3)
+                          Group Key: s.song_id
+                          Buffers: shared hit=1796 read=20187
+                          ->  Merge Join  (cost=44141.11..44207.59 rows=4292 width=150) (actual time=55.152..55.541 rows=3346.67 loops=3)
+                                Merge Cond: (p.track_id = s.song_id)
+                                Buffers: shared hit=1796 read=20187
+                                ->  Sort  (cost=44108.62..44119.35 rows=4292 width=4) (actual time=55.081..55.183 rows=3346.67 loops=3)
+                                      Sort Key: p.track_id
+                                      Sort Method: quicksort  Memory: 193kB
+                                      Buffers: shared hit=1794 read=20187
+                                      Worker 0:  Sort Method: quicksort  Memory: 25kB
+                                      Worker 1:  Sort Method: quicksort  Memory: 97kB
+                                      ->  Parallel Seq Scan on plays p  (cost=0.00..43849.65 rows=4292 width=4) (actual time=0.133..54.802 rows=3346.67 loops=3)
+                                            Filter: ((played_at >= '2025-01-01 00:00:00'::timestamp without time zone) AND (played_at < '2026-01-01 00:00:00'::timestamp without time zone) AND (user_id = 1))
+                                            Rows Removed by Filter: 996729
+                                            Buffers: shared hit=1786 read=20187
+                                ->  Sort  (cost=32.50..33.55 rows=420 width=150) (actual time=0.102..0.104 rows=27.00 loops=2)
+                                      Sort Key: s.song_id
+                                      Sort Method: quicksort  Memory: 25kB
+                                      Buffers: shared hit=2
+                                      Worker 1:  Sort Method: quicksort  Memory: 25kB
+                                      ->  Seq Scan on songs s  (cost=0.00..14.20 rows=420 width=150) (actual time=0.079..0.081 rows=27.00 loops=2)
+                                            Buffers: shared hit=2
+Planning:
+  Buffers: shared hit=4
+Planning Time: 0.128 ms
+Execution Time: 143.397 ms
