@@ -1,8 +1,4 @@
--- Analyze these two tables and their attributes involved in the query below.
-ANALYZE plays (user_id, played_at, track_id);
-ANALYZE songs (song_id, title);
-
--- This query is now far faster, using a composite index of user_id and played_at that also includes track_id.
+-- This query is now far faster than the unfixed one, using a composite index of user_id and played_at that also includes track_id.
 SELECT s.song_id, s.title, COUNT(played_at) AS play_count
 FROM   plays p
 JOIN   songs s ON s.song_id = p.track_id
