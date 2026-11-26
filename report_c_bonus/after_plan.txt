@@ -1,0 +1,22 @@
+Limit  (cost=0.58..3.68 rows=50 width=17) (actual time=0.013..0.038 rows=50.00 loops=1)
+  Buffers: shared hit=44
+  ->  Nested Loop  (cost=0.58..1314.91 rows=21202 width=17) (actual time=0.013..0.035 rows=50.00 loops=1)
+        Buffers: shared hit=44
+        ->  Index Only Scan Backward using idx_plays_user_played on plays p  (cost=0.43..791.46 rows=21202 width=12) (actual time=0.008..0.010 rows=50.00 loops=1)
+              Index Cond: (user_id = 1)
+              Heap Fetches: 0
+              Index Searches: 1
+              Buffers: shared hit=4
+        ->  Memoize  (cost=0.15..0.17 rows=1 width=13) (actual time=0.000..0.000 rows=1.00 loops=50)
+              Cache Key: p.track_id
+              Cache Mode: logical
+              Hits: 30  Misses: 20  Evictions: 0  Overflows: 0  Memory Usage: 3kB
+              Buffers: shared hit=40
+              ->  Index Scan using songs_pkey on songs s  (cost=0.14..0.16 rows=1 width=13) (actual time=0.000..0.000 rows=1.00 loops=20)
+                    Index Cond: (song_id = p.track_id)
+                    Index Searches: 20
+                    Buffers: shared hit=40
+Planning:
+  Buffers: shared hit=4
+Planning Time: 0.129 ms
+Execution Time: 0.051 ms
